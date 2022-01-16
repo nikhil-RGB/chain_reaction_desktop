@@ -1,0 +1,8 @@
+Given are the terms used in this project:
+Cell: A single button/ grid box in the grid. Can hold a maximum of three units.
+Units: An entity which is owned by a player and placed in the cell when the player clicks
+on the cell, or as the result of a reaction.
+Critical mass: The maximum number of units a cell can hold without exploding.
+Explosion: The process of an unstable cell releasing the number of units equal to critical mass 
+for the cell+1.
+Critical mass for cells at the edge=2, corner=1, center=3.

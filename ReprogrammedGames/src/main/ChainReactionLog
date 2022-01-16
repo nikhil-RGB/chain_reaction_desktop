@@ -1,0 +1,7 @@
+1)Add function to clear out info in the logs upon a undo operation.-DONE!
+2)Add a save option for chain reaction, using Serialization.-DONE
+3)Add a more about developer option.-DONE
+4)Add an animation for critical mass cells-DONE
+5)Add a AI opponent option-manual.
+6)Add a MCTS based AI opponent.
+7)Remove the file which was loaded once done, add add a check for whether the file was created or not in save game method.-DONE
