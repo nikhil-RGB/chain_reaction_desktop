@@ -1,4 +1,6 @@
 # chain_reaction_desktop
+<img width="255" alt="icon" src="https://user-images.githubusercontent.com/68727041/150774257-cfbcc57c-78cb-41c6-8518-150be09e7a37.png">
+<br>
 An application which emulates the android chain reaction game on PC.<br>
 Built using JAVA, GUI built with SWING.<br>
 Download the CHAIN_REACTION_2022 zip file from releases and unzip it, run the .exe or .jar file to use the app.
@@ -10,4 +12,5 @@ Side note:
 The CellButton class in the frontend package is a child of the Cell class, and allows for animated orbs inside the buttons, via<br>
 custom painting by overriding the paintComponent() function of the JButton class, and using the parametric form of the equation for<br>
 an ellipse to define the locus of the orb painted. More details are provided in the source code files(CellButton.java)
+
 
