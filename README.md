@@ -12,5 +12,6 @@ Side note:
 The CellButton class in the frontend package is a child of the Cell class, and allows for animated orbs inside the buttons, via<br>
 custom painting by overriding the paintComponent() function of the JButton class, and using the parametric form of the equation for<br>
 an ellipse to define the locus of the orb painted. More details are provided in the source code files(CellButton.java)
+---
 
 

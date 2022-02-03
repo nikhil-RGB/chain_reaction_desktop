@@ -6,3 +6,4 @@ Critical mass: The maximum number of units a cell can hold without exploding.
 Explosion: The process of an unstable cell releasing the number of units equal to critical mass 
 for the cell+1.
 Critical mass for cells at the edge=2, corner=1, center=3.
+Cells are the fundamental units in the board
