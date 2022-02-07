@@ -18,6 +18,7 @@ import main.Player;
 //Main frame for a chain reaction game,it must be initialized with a GamePanel(initialized or non -initialized)
 public final class LauncherWindow extends JFrame
 {
+	private static String im_path="box_pic.png";
 	private static final long serialVersionUID = -2837834386357626982L;//serialVersionUID
 	private GamePanel main_panel;//The main game panel, this is the JPanel which holds all the buttons
 	public static WindowAdapter cancelInit;//The windowAdapter stating what must be done in case an initialization is cancelled.
@@ -76,8 +77,8 @@ public final class LauncherWindow extends JFrame
 		ArrayList<Player> pls=LauncherWindow.createInitializationWindow();
 		CellGrid cg=new CellGrid(x,y,pls);
 		//TEMP CODE
-		pls.get(1).setAIcontrolled(true);
-		pls.get(2).setAIcontrolled(true);
+		//pls.get(1).setAIcontrolled(true);
+		//pls.get(2).setAIcontrolled(true);
 		//TEMP CODE
 		SwingUtilities.invokeLater(()->{
 		LauncherWindow jfr=new LauncherWindow("Chain Reaction!");
@@ -240,13 +241,13 @@ public final class LauncherWindow extends JFrame
 	//it is executed, so it must be used with discretion
 	private static ArrayList<Player> createPlayerInput(int size)
 	{
-
+        ArrayList<JCheckBox> arrs=LauncherWindow.createAIOptions(size);
 		JFrame frm=new JFrame("Enter Player names");
 		LauncherWindow.setIconTo(frm);
 		frm.addWindowListener(LauncherWindow.cancelInit);
 		frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		ArrayList<JTextField> jtf=new ArrayList<>(0);
-		Box cont=Box.createVerticalBox();
+		Box cont=new CustomPictureBox(BoxLayout.Y_AXIS,new ImageIcon(im_path));
 		cont.setOpaque(true);
 		cont.setBackground(Color.BLACK);
 		cont.setBorder(bord);
@@ -265,6 +266,21 @@ public final class LauncherWindow extends JFrame
 		 cont.add(c);
 		 cont.add(Box.createRigidArea(new Dimension(10,20)));
 		 cont.add(jtf1);
+		 cont.add(Box.createRigidArea(new Dimension(10,20)));
+		 //add indie checkboxes here
+		 JComponent c_fin=null;
+		 if(i==0)
+		 {
+			JLabel lab=new JLabel("First Player cannot be AI-enabled");
+			lab.setBorder(bord);
+			lab.setForeground(Color.WHITE);
+			c_fin=lab;
+		 }
+		 else
+		 {
+		   c_fin=arrs.get(i-1);
+		 }
+		 cont.add(c_fin);
 		 cont.add(Box.createRigidArea(new Dimension(10,20)));
 		 }
 		JButton okay=new JButton("Okay");
@@ -322,6 +338,16 @@ public final class LauncherWindow extends JFrame
 		frm.setResizable(false);
 		while(pls==null)
 		{}
+		for(int k=0;k<pls.size();++k)
+		{
+			if(k!=0)
+			{
+			JCheckBox cb=arrs.get(k-1);
+			Player p=pls.get(k);
+			p.setAIcontrolled(cb.isSelected());
+			}
+			
+		}
 		return pls;
 	}
 	//this method checks if the name inputs are valid
@@ -395,5 +421,43 @@ public final class LauncherWindow extends JFrame
 		return menu;
 		}
     
+	//This method creates a list of checkboxes with event listeners-to specify whether players
+	// are ai controlled or not
+	public static ArrayList<JCheckBox> createAIOptions(int size)
+	{
+	 ArrayList<JCheckBox> arrs=new ArrayList<>(0);
+	 for(int k=1;k<size;++k)
+	 {
+		JCheckBox jcb=new JCheckBox("AI controlled player");
+		jcb.setBorder(bord);
+		jcb.setToolTipText("Select to make this player computer-controlled");
+	    arrs.add(jcb);
+	 }
+	 
+		return arrs;
+	}
 	
+	//This inner class can be used for creating custom picture background vertical boxes
+	public static class CustomPictureBox extends Box
+	{
+        
+		private static final long serialVersionUID = 1L;
+		Image img;
+		public CustomPictureBox(int axis,ImageIcon gg) 
+		{
+			super(axis);
+			this.img=gg.getImage();
+		}
+		@Override
+		public void paintComponent(Graphics g)
+		{
+			super.paintComponent(g);
+			if(this.img==null)
+			{return;}
+			g.drawImage(this.img,0,0,this.getWidth()+1,this.getHeight()+1,null);
+		}
+		
+		
+		
+	}
 }
