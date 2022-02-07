@@ -195,6 +195,30 @@ public Player getPlayer()
 Player p=this.players.get(this.tracker);
 return p;
 }
+//This method returns the next Player's player object representation
+//without actually moving to the next player
+public Player getNextPlayer()
+{
+	int ntracker=this.getTracker();
+	++ntracker;
+	if(ntracker>=this.players.size())
+	{
+	 ntracker=0;
+	}
+	return this.players.get(ntracker);
+}
+//This method returns the previous player's object representation
+//without actualy shifting control to the previous player
+public Player getPreviousPlayer()
+{
+int ntracker=this.getTracker();
+--ntracker;
+if(ntracker<0)
+{
+ntracker=this.players.size()-1;	
+}
+return this.players.get(ntracker);
+}
 
 //end of class
 }

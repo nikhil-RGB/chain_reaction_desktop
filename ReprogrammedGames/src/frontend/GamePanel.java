@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -28,7 +29,8 @@ public final class GamePanel extends JPanel
 	private boolean isReady;//this field states whether the Board is initialized yet
 	private ArrayList<GamePanel.Move> moves;//List of recent moves played
 	private CellGrid backup;//n-moves prior board backup object
-	
+	private  volatile boolean aiThinking;//specifies if any ai player is processing data at any point in the game, effctively pausing all action listeners at that point
+	//private static String message="The AI is thinking, please let the AI player player their move";//message to be displayed if player attempts to make a move when the ai is thinking
 	static
 	{
 		normalB=new RoundedBorder(6);
@@ -54,13 +56,31 @@ public final class GamePanel extends JPanel
 	{
 		ActionListener undo= (ev)->
 		{
+			//if AI thinking process is going on, prevents listener from being executed.
+			if(this.aiThinking)
+			{
+				//JOptionPane.showMessageDialog(null, message);
+				return;
+			}
+		 
 		 
 		 if(this.moves.isEmpty())
 		 {
 			 JOptionPane.showMessageDialog(this,"Cannot perform undo operation immedietly after"
-			 		+ "\na player was eliminated, or a game cycle\nhas been completed.");
+			 		+ "\na player was eliminated, or a game cycle\nhas been completed."
+			 		+ "\nPS: AI player moves cannot be undone.");
 		 return;
 		 }
+		 
+		 boolean no_undo=this.gdata.getPreviousPlayer().isAIcontrolled();
+		 if(no_undo)
+		 {
+			 this.moves.clear();
+			 this.backup=this.gdata.clone();
+			 JOptionPane.showMessageDialog(this,"AI player moves cannot be undone.");
+		 return;
+		 }
+		 
 		 int typem=this.moves.get(this.moves.size()-1).getType();
 		 //this is the type of the move just revoked,0 or 1.
 		 this.moves.remove(this.moves.size()-1);
@@ -93,6 +113,11 @@ public final class GamePanel extends JPanel
 		
 		ActionListener ar=(ev)->
 		{   
+			if(this.aiThinking)
+			{
+				//JOptionPane.showMessageDialog(null, message);
+				return;
+			}
 			this.gdata.messages.clear();
 			String amd=ev.getActionCommand();
 			Scanner reader=new Scanner(amd);
@@ -178,6 +203,18 @@ public final class GamePanel extends JPanel
 				this.setEnabledButtons(noWin);
 			
 			this.gdata.messages.clear();
+			
+			//add in ai player move check-cc is the player whose chance it is
+			Point clckAt=this.simulateNextMove(cc);
+			if(clckAt!=null)
+			{
+			this.aiThinking=false;
+			this.buttons[clckAt.x][clckAt.y].doClick();
+			this.moves.clear();//clears recent moves log
+			this.backup=this.gdata.clone();//resets backup to current board state
+			}
+			//end of ai interference.
+			
 			};
 			new Thread(obj).start();
 		};
@@ -458,6 +495,117 @@ public final class GamePanel extends JPanel
 				}
 			}
 		}
+	}
+	
+	//This method simulates the next move for an ai opponent  
+	public Point simulateNextMove(Player r)
+	{
+	
+	if((!r.isAIcontrolled())||(this.gdata.winner!=null))
+	{return null;}
+	this.aiThinking=true;//pauses all action listeners in game
+	int x=0;
+	int y=0;
+	//Temp code
+	ArrayList<Cell> ars=this.immediateExplodable(r);
+	if(ars.size()!=0)
+	{
+		Cell c=ars.get(0);
+		x=c.getLocation().x;
+		y=c.getLocation().y;
+	}
+	else
+	{
+		Cell c=this.placeRandomFast(r);
+		x=c.getLocation().x;
+		y=c.getLocation().y;
+		
+	}
+	
+	//Temp code end
+	try 
+	{
+		Thread.sleep(1500);
+	} 
+	catch (InterruptedException e)
+	{}
+	//this.buttons[x][y].doClick();//performs move at selected coordinates
+	//code to simulate over
+	return new Point(x,y);
+	}
+	//This method finds the cells with critical mass of the opponent
+	public ArrayList<Cell> findCriticalOpps(Color r)
+	{
+		ArrayList<Cell> ars=new ArrayList<>(0);
+		Cell[][] table=this.gdata.getGrid();
+		for(int i=0;i<table.length;++i)
+		{
+			for(int j=0;j<table[i].length;++j)
+			{
+				Cell curr=table[i][j];
+				if((curr.isCritical())&&(!curr.getOwner().equals(r)))
+				{
+		         ars.add(curr);			
+				}
+			}
+		}
+	return ars;
+	}
+	//This method checks if there are any owned critical cells next to a specefic location
+	public ArrayList<Cell> filterCriticalCell(ArrayList<Cell> cells,Color rr)
+	{
+		ArrayList<Cell> arrs=new ArrayList<>(0);
+		for(Cell c:cells)
+		{
+			ArrayList<Cell> adjs=c.adjacentCells(this.gdata.getGrid());
+			for(Cell in:adjs)
+			{
+				if(in.isCritical()&&(in.getOwner().equals(rr)))
+				{
+					arrs.add(in);
+				}
+			}
+		}
+		return arrs;
+	}
+	//This method returns a list of all cells which can cause a chain reaction on click
+	public ArrayList<Cell> immediateExplodable(Player r)
+	{
+		ArrayList<Cell> cells=this.filterCriticalCell(this.findCriticalOpps(r.getColor()), r.getColor());
+	    return cells;
+	}
+	
+	//This method offers a random blank spot to place the cell in.
+	public Cell placeRandom(Player pl)
+	{
+		Color r=Color.RED;
+		Cell cc=null;
+		while((!r.equals(Color.BLACK))&&(!r.equals(pl.getColor())))
+		{
+			Random rand=new Random();
+			int x=rand.nextInt(this.gdata.getGrid().length);
+			int y=rand.nextInt(this.gdata.getGrid()[0].length);
+			cc=this.gdata.getGrid()[x][y];
+			r=cc.getOwner();
+		}
+		return cc;
+	}
+	//This method offers the immediately next blank cell to place its cell down
+	//best for testing purposes
+	public Cell placeRandomFast(Player rn)
+	{
+		Color r=rn.getColor();
+		Cell[][] tb=this.gdata.getGrid();
+		for(int i=0;i<tb.length;++i)
+		{
+			for(int j=0;j<tb[0].length;++j)
+			{
+				Cell first=tb[i][j];
+				if(first.getOwner().equals(Color.BLACK)||first.getOwner().equals(r))
+				{return first;}
+			}
+		}
+		return null;
 	}
 //End of class
 }

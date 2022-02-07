@@ -156,26 +156,27 @@ public final class Cell implements java.io.Serializable
     	return rets;
     }
     
-    //Adds a unit to the cell,causes an explosion if addition makes cell unstable
-    //Returns true if operation is successful, false if operation fails die to any reason.
-    //Can be a time and resource intensive task in case of larger chain reactions.
-    @SuppressWarnings("unused")
-	public boolean addUnit(Color pl,CellGrid grid)
-    {
-    	
-    	if((!this.getOwner().equals(Color.BLACK))&&(!pl.equals(this.getOwner())))
-    	{return false;}
-    	this.setOwner(pl);
-    	this.count++;
-    	EXPLOSION:
-    	if(!this.isStable())
-    	{
-    		this.explode(grid);
-    	}
-        return true;
-    }
+
     
-    //This method marks or unmarks the invoking cell as an explosion source.
+    //Adds a unit to the cell,causes an explosion if addition makes cell unstable
+	//Returns true if operation is successful, false if operation fails die to any reason.
+	//Can be a time and resource intensive task in case of larger chain reactions.
+	@SuppressWarnings("unused")
+	public boolean addUnit(Color pl,CellGrid grid)
+	{
+		
+		if((!this.getOwner().equals(Color.BLACK))&&(!pl.equals(this.getOwner())))
+		{return false;}
+		this.setOwner(pl);
+		this.count++;
+		EXPLOSION:
+		if(!this.isStable())
+		{
+			this.explode(grid);
+		}
+	    return true;
+	}
+	//This method marks or unmarks the invoking cell as an explosion source.
     public void markExplosionSource(boolean val)
     {
     	this.exploded=val;

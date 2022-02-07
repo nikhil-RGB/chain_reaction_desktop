@@ -75,7 +75,10 @@ public final class LauncherWindow extends JFrame
 		
 		ArrayList<Player> pls=LauncherWindow.createInitializationWindow();
 		CellGrid cg=new CellGrid(x,y,pls);
-		
+		//TEMP CODE
+		pls.get(1).setAIcontrolled(true);
+		pls.get(2).setAIcontrolled(true);
+		//TEMP CODE
 		SwingUtilities.invokeLater(()->{
 		LauncherWindow jfr=new LauncherWindow("Chain Reaction!");
 		LauncherWindow.setIconTo(jfr);
