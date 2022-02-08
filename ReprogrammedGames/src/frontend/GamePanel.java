@@ -524,13 +524,53 @@ public final class GamePanel extends JPanel
 	ArrayList<Cell> ars=this.immediateExplodable(r);
 	if(ars.size()!=0)
 	{
-		Cell c=ars.get(0);
-		x=c.getLocation().x;
-		y=c.getLocation().y;
+		//this code takes the first available explosion spot
+		//Cell c=ars.get(0);
+		//x=c.getLocation().x;
+		//y=c.getLocation().y;
+		
+		//This snippet ensures selection of highest output crit cell
+		int max=0;
+		Point chosen=new Point(0,0);
+		for(Cell toExplode:ars)
+		{
+			int current_max=0;
+			ArrayList<Point> cellsToCheck=new ArrayList<Point>(0);
+			cellsToCheck.add(toExplode.getLocation());
+			while(cellsToCheck.size()!=0)
+			{
+				Point eval=cellsToCheck.get(0);
+				Cell current=this.gdata.getGrid()[eval.x][eval.y];
+				if(current.isCritical())
+				{
+			      if(!current.getOwner().equals(r.getColor()))	 
+			      {
+			    	  ++current_max;
+			      }
+			      ArrayList<Cell> adjs=current.adjacentCells(this.gdata.getGrid());
+			      adjs.forEach((acell)->{
+			    	  if(acell.isCritical())
+			    	  {
+			    		  cellsToCheck.add(acell.getLocation());
+			    	  }
+			      });
+			      if(current_max>max)
+			      {
+			    	  max=current_max;
+			    	  chosen=eval;
+			      }
+			     
+				}
+				cellsToCheck.remove(0);
+			}
+			
+		}
+		x=chosen.x;
+		y=chosen.y;
 	}
 	else
 	{
-		Cell c=this.placeRandom(r);
+		Cell c=this.placeRandomFast(r);
 		x=c.getLocation().x;
 		y=c.getLocation().y;
 		
