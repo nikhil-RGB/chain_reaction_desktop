@@ -429,6 +429,20 @@ public final class GamePanel extends JPanel
 			jfr.setVisible(true);
 			GamePanel.OrbsAnimation rn=gp.new OrbsAnimation();
 			rn.start();
+			
+			//add in ai player move check-cc is the player whose chance it is
+			Point clckAt=gp.simulateNextMove(gp.gdata.getPlayer());
+			if(clckAt!=null)
+			{
+			gp.aiThinking=false;
+			gp.buttons[clckAt.x][clckAt.y].doClick();
+			gp.moves.clear();//clears recent moves log
+			gp.backup=gp.gdata.clone();//resets backup to current board state
+			}
+			//end of ai interference.
+			
+			
+			
 			f.delete();
 		    });
 	}
@@ -516,7 +530,7 @@ public final class GamePanel extends JPanel
 	}
 	else
 	{
-		Cell c=this.placeRandomFast(r);
+		Cell c=this.placeRandom(r);
 		x=c.getLocation().x;
 		y=c.getLocation().y;
 		
