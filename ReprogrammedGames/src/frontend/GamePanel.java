@@ -248,6 +248,7 @@ public final class GamePanel extends JPanel
 	jm.add(saves[1]);
 	this.parent.getJMenuBar().add(jm);
 	this.isReady=true;
+	//this.placeDownCrits();//comment this line out later, only for tests
 	}
 
   //This method synchronizes the back-end data with the front end GUI
@@ -534,12 +535,13 @@ public final class GamePanel extends JPanel
 		Point chosen=new Point(0,0);
 		for(Cell toExplode:ars)
 		{
+			
 			int current_max=0;
 			ArrayList<Point> cellsToCheck=new ArrayList<Point>(0);
 			cellsToCheck.add(toExplode.getLocation());
-			while(cellsToCheck.size()!=0)
+			for(int i=0;i<cellsToCheck.size();++i)
 			{
-				Point eval=cellsToCheck.get(0);
+				Point eval=cellsToCheck.get(i);
 				Cell current=this.gdata.getGrid()[eval.x][eval.y];
 				if(current.isCritical())
 				{
@@ -551,18 +553,20 @@ public final class GamePanel extends JPanel
 			      adjs.forEach((acell)->{
 			    	  if(acell.isCritical())
 			    	  {
-			    		  cellsToCheck.add(acell.getLocation());
+			    		  if(!cellsToCheck.contains(acell.getLocation()))
+			    		  {cellsToCheck.add(acell.getLocation());}
 			    	  }
 			      });
-			      if(current_max>max)
-			      {
-			    	  max=current_max;
-			    	  chosen=eval;
 			      }
-			     
-				}
-				cellsToCheck.remove(0);
+				
+				//cellsToCheck.remove(0);
 			}
+			cellsToCheck.clear();
+			if(current_max>max)
+		      {
+		    	  max=current_max;
+		    	  chosen=toExplode.getLocation();
+		      }
 			
 		}
 		x=chosen.x;
@@ -660,6 +664,28 @@ public final class GamePanel extends JPanel
 			}
 		}
 		return null;
+	}
+	//A method which artificially places down units in cells, so that AI testing may be possible
+	//Places down units for AI opponents only
+	public void placeDownCrits()
+	{
+		ArrayList<Player> pls=this.gdata.getPlayers();
+		for(Player p:pls)
+		{
+			Cell c=null;
+			do
+			{
+			int x=new Random().nextInt(this.gdata.getGrid().length);
+			int y=new Random().nextInt(this.gdata.getGrid()[0].length);
+			c=this.gdata.getGrid()[x][y];
+			}
+			while(!(c.getOwner().equals(Color.BLACK)||c.getOwner().equals(p.getColor())));
+		    
+			while(!c.isCritical())
+		    {
+		    c.addUnit(p.getColor(),this.gdata);	
+		    }
+		}
 	}
 //End of class
 }
