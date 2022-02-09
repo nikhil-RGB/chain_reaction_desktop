@@ -248,7 +248,7 @@ public final class GamePanel extends JPanel
 	jm.add(saves[1]);
 	this.parent.getJMenuBar().add(jm);
 	this.isReady=true;
-	//this.placeDownCrits();//comment this line out later, only for tests
+	this.placeDownCrits(this.gdata.getNextPlayer());//comment this line out later, only for tests
 	}
 
   //This method synchronizes the back-end data with the front end GUI
@@ -667,10 +667,10 @@ public final class GamePanel extends JPanel
 	}
 	//A method which artificially places down units in cells, so that AI testing may be possible
 	//Places down units for AI opponents only
-	public void placeDownCrits()
+	public void placeDownCrits(Player p)
 	{
-		ArrayList<Player> pls=this.gdata.getPlayers();
-		for(Player p:pls)
+		
+		for(int k=0;k<3;++k)
 		{
 			Cell c=null;
 			do
@@ -681,10 +681,11 @@ public final class GamePanel extends JPanel
 			}
 			while(!(c.getOwner().equals(Color.BLACK)||c.getOwner().equals(p.getColor())));
 		    
-			while(!c.isCritical())
-		    {
-		    c.addUnit(p.getColor(),this.gdata);	
-		    }
+			//while(!c.isCritical())
+		    //{
+		    //c.addUnit(p.getColor(),this.gdata);	
+		    //}
+			c.format(c.getCritMass(),p.getColor());
 		}
 	}
 //End of class
