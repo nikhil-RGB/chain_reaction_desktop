@@ -248,7 +248,7 @@ public final class GamePanel extends JPanel
 	jm.add(saves[1]);
 	this.parent.getJMenuBar().add(jm);
 	this.isReady=true;
-	this.placeDownCrits(this.gdata.getNextPlayer());//comment this line out later, only for tests
+	//this.placeDownCrits(this.gdata.getNextPlayer());//comment this line out later, only for tests
 	}
 
   //This method synchronizes the back-end data with the front end GUI
@@ -636,16 +636,24 @@ public final class GamePanel extends JPanel
 	//This method offers a random blank spot to place the cell in.
 	public Cell placeRandom(Player pl)
 	{
+		long time_t=System.currentTimeMillis();
 		Color r=Color.RED;
 		Cell cc=null;
-		while((!r.equals(Color.BLACK))&&(!r.equals(pl.getColor())))
+		do
 		{
 			Random rand=new Random();
 			int x=rand.nextInt(this.gdata.getGrid().length);
 			int y=rand.nextInt(this.gdata.getGrid()[0].length);
 			cc=this.gdata.getGrid()[x][y];
 			r=cc.getOwner();
+			long time_n=System.currentTimeMillis();
+			if(((time_n-time_t)/1000.0)>2)
+			{
+				cc=this.desperateMove(pl);
+				break;
+			}
 		}
+		while((this.isDangerous(pl, cc.getLocation()))||((!r.equals(Color.BLACK))&&(!r.equals(pl.getColor()))));
 		return cc;
 	}
 	//This method offers the immediately next blank cell to place its cell down
@@ -659,8 +667,23 @@ public final class GamePanel extends JPanel
 			for(int j=0;j<tb[0].length;++j)
 			{
 				Cell first=tb[i][j];
-				if(first.getOwner().equals(Color.BLACK)||first.getOwner().equals(r))
+				if((!this.isDangerous(rn,first.getLocation()))&&(first.getOwner().equals(Color.BLACK)||first.getOwner().equals(r)))
 				{return first;}
+			}
+		}
+		return this.desperateMove(rn);
+	}
+	//Plays the first valid move in the board, regardless of the conditions
+	public Cell desperateMove(Player rn)
+	{
+		Cell[][] grid=this.gdata.getGrid();
+		for(int i=0;i<grid.length;++i)
+		{
+			for(int j=0;j<grid[i].length;++j)
+			{
+				Cell curr=grid[i][j];
+				if(curr.getOwner().equals(Color.BLACK)||curr.getOwner().equals(rn.getColor()))
+				{return curr;}
 			}
 		}
 		return null;
@@ -687,6 +710,22 @@ public final class GamePanel extends JPanel
 		    //}
 			c.format(c.getCritMass(),p.getColor());
 		}
+	}
+	
+	//This method checks if there is an opponent critical cell adjacent to chosen position
+	//Therefore, checking if the cell under consideration is "dangerous" to use for cell-positioning
+	public boolean isDangerous(Player pl,Point p)
+	{
+		Cell current=this.gdata.getGrid()[p.x][p.y];
+		ArrayList<Cell> cells=current.adjacentCells(this.gdata.getGrid());
+		for(Cell item:cells)
+		 {
+			if(item.isCritical()&&(!item.getOwner().equals(pl.getColor()))) 
+			{
+				return true;
+			}
+		 }
+		return false;
 	}
 //End of class
 }
