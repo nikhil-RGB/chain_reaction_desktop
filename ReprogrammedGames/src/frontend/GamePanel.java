@@ -574,7 +574,9 @@ public final class GamePanel extends JPanel
 	}
 	else
 	{
-		Cell c=this.placeRandom(r);
+		Cell c=null;
+		if((c=this.cornerCellPlacement(r))==null)
+		{c=this.placeRandom(r);}
 		x=c.getLocation().x;
 		y=c.getLocation().y;
 		
@@ -731,6 +733,18 @@ public final class GamePanel extends JPanel
 	public double percentageOccupancy(Player p)
 	{
 		return 0.0;
+	}
+	//This method gives back an edge cell placement if it is a safe move to play
+	public Cell cornerCellPlacement(Player p)
+	{
+		Cell[][] grid=this.gdata.getGrid();
+		Cell[] corners= {grid[0][0],grid[0][grid[0].length-1],grid[grid.length-1][0],grid[grid.length-1][grid[0].length-1]};
+		for(Cell c:corners)
+		{
+			if((!this.isDangerous(p, c.getLocation()))&&(c.getOwner().equals(Color.BLACK)))
+			{return c;}
+		}
+		return null;
 	}
 //End of class
 }
