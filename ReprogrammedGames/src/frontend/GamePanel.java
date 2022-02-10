@@ -574,7 +574,7 @@ public final class GamePanel extends JPanel
 	}
 	else
 	{
-		Cell c=this.placeRandomFast(r);
+		Cell c=this.placeRandom(r);
 		x=c.getLocation().x;
 		y=c.getLocation().y;
 		
@@ -726,6 +726,11 @@ public final class GamePanel extends JPanel
 			}
 		 }
 		return false;
+	}
+	//This method calculates percentage occupancy of a particular player in the game
+	public double percentageOccupancy(Player p)
+	{
+		return 0.0;
 	}
 //End of class
 }
