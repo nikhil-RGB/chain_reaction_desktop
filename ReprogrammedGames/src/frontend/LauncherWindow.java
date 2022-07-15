@@ -387,8 +387,8 @@ public final class LauncherWindow extends JFrame
 	//this method creates the menu items for the about developer menu
 	private static JMenu aboutDevMenu()
 	{
-		String ab="https://www.swingguiking.com/";
-		String wk="https://www.swingguiking.com/my-work";
+		String ab="https://linktr.ee/nikhil_n67";
+		String wk="https://nikhil-rgb.github.io";
 		
 		JMenuItem about=new JMenuItem("More about Developer");
 		JMenuItem work=new JMenuItem("Other apps from this developer");
